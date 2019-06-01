@@ -77,7 +77,7 @@ public class UserTypeDaoImpl implements UserTypeDao {
     public Optional<UserType> getById(Long id) {
         Connection connection = connectionPool.getConnection();
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT type FROM user_type WHERE id = ?");
+            PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID);
             preparedStatement.setLong(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
