@@ -13,9 +13,12 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 public class TaxReportDaoImpl implements TaxReportDao {
-    public static final String SELECT_BY_ID = "SELECT * FROM reports WHERE id = ?";
-    public static final String SELECT_REJECTED_INSPECTORS = "SELECT inspector_id FROM reports_rejected_inspectors WHERE report_id = ?";
-    public static final String INSERT_INTO_REJECTED_INSPECTORS = "INSERT INTO reports_rejected_inspectors (report_id, inspector_id) VALUES ";
+    private static final String SELECT_BY_ID = "SELECT * FROM reports WHERE id = ?";
+    private static final String SELECT_REJECTED_INSPECTORS = "SELECT inspector_id FROM reports_rejected_inspectors WHERE report_id = ?";
+    private static final String INSERT_INTO_REJECTED_INSPECTORS = "INSERT INTO reports_rejected_inspectors (report_id, inspector_id) VALUES ";
+    private static final String SELECT_ALL = "SELECT * FROM reports";
+    private static final String UPDATE = "UPDATE tax_reports SET content = ?, author_id = ?, status_id = ?, creation_datetime = ?, update_datetime = ?, inspector_id = ? WHERE (id = ?)";
+    private static final String DELETE = "DELETE FROM tax_reports WHERE id = ?";
     private final Logger LOGGER = Logger.getLogger(getClass());
     private static final String INSERT = "INSERT INTO reports (content, author_id, status_id," +
             " creation_datetime, update_datetime, inspector_id) VALUES (?, ?, ?, ?, ?, ?);";
@@ -138,13 +141,12 @@ public class TaxReportDaoImpl implements TaxReportDao {
         Connection connection = connectionPool.getConnection();
         List<TaxReport> taxReports = new ArrayList<>();
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM reports");
+            PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL);
             ResultSet resultSet = preparedStatement.executeQuery();
             taxReports = getFromResultSet(resultSet);
         } catch (SQLException e) {
             LOGGER.error(e);
-        }
-        finally {
+        } finally {
             connectionPool.releaseConnection(connection);
         }
         return taxReports;
@@ -153,12 +155,23 @@ public class TaxReportDaoImpl implements TaxReportDao {
     @Override
     public void update(TaxReport taxReport) {
         Connection connection = connectionPool.getConnection();
-        try { //TODO
-            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE tax_reports SET status = ? WHERE id = ?");
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(UPDATE);
+            preparedStatement.setString(1, taxReport.getContent());
+            preparedStatement.setLong(2, taxReport.getAuthor().getId());
+            preparedStatement.setLong(3, taxReport.getReportStatus().getId());
+            preparedStatement.setTimestamp(4, Timestamp.valueOf(taxReport.getCreationTime()));
+            preparedStatement.setTimestamp(5, Timestamp.valueOf(taxReport.getLastUpdatedTime()));
+            preparedStatement.setLong(6, taxReport.getInspector().getId());
+
+            int affectedRows = preparedStatement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Updating tax report failed, no rows affected.");
+            }
+
         } catch (SQLException e) {
             LOGGER.error(e);
-        }
-        finally {
+        } finally {
             connectionPool.releaseConnection(connection);
         }
     }
@@ -167,13 +180,17 @@ public class TaxReportDaoImpl implements TaxReportDao {
     public void delete(TaxReport taxReport) {
         Connection connection = connectionPool.getConnection();
 
-        try {//TODO
-            PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM tax_reports WHERE id = ?");
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(DELETE);
+            preparedStatement.setLong(1, taxReport.getId());
 
+            int affectedRows = preparedStatement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Deleting tax report failed, no rows affected.");
+            }
         } catch (SQLException e) {
             LOGGER.error(e);
-        }
-        finally {
+        } finally {
             connectionPool.releaseConnection(connection);
         }
     }
@@ -206,8 +223,7 @@ public class TaxReportDaoImpl implements TaxReportDao {
 
         } catch (SQLException e) {
             LOGGER.error(e);
-        }
-        finally {
+        } finally {
             connectionPool.releaseConnection(connection);
         }
         return taxReports;
