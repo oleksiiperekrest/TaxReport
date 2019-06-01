@@ -16,12 +16,12 @@ import java.util.Optional;
 
 public class ReportStatusDaoImpl implements ReportStatusDao {
 
-    public static final String SELECT_ID_BY_STATUS = "SELECT id FROM report_status WHERE status = ?";
-    public static final String SELECT_ALL = "SELECT * FROM report_status";
-    public static final String SELECT_BY_ID = "SELECT status FROM report_status WHERE id = ?";
-    public static final String CREATE = "INSERT INTO report_status (status) VALUES (?)";
-    public static final String UPDATE = "UPDATE report_status SET status = ? WHERE (id = ?)";
-    public static final String DELETE = "DELETE FROM report_status WHERE id = ?";
+    private static final String SELECT_ID_BY_STATUS = "SELECT id FROM report_status WHERE status = ?";
+    private static final String SELECT_ALL = "SELECT * FROM report_status";
+    private static final String SELECT_BY_ID = "SELECT status FROM report_status WHERE id = ?";
+    private static final String CREATE = "INSERT INTO report_status (status) VALUES (?)";
+    private static final String UPDATE = "UPDATE report_status SET status = ? WHERE (id = ?)";
+    private static final String DELETE = "DELETE FROM report_status WHERE id = ?";
     private final Logger LOGGER = Logger.getLogger(getClass());
 
     private ConnectionPool connectionPool;
