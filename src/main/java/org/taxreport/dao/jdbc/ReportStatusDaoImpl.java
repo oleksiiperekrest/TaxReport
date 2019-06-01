@@ -58,7 +58,7 @@ public class ReportStatusDaoImpl implements ReportStatusDao {
             preparedStatement.setString(1, reportStatus.getStatus());
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows == 0) {
-                throw new SQLException("Creating individual failed, no rows affected.");
+                throw new SQLException("Creating report status failed, no rows affected.");
             }
             ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
             if (generatedKeys.next()) {
@@ -135,7 +135,7 @@ public class ReportStatusDaoImpl implements ReportStatusDao {
             preparedStatement.setLong(1, reportStatus.getId());
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows == 0) {
-                throw new SQLException("Updating report status failed, no rows affected.");
+                throw new SQLException("Deleting report status failed, no rows affected.");
             }
         } catch (SQLException e) {
             LOGGER.error(e);
