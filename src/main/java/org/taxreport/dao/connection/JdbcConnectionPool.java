@@ -14,12 +14,12 @@ import java.util.Properties;
 
 public final class JdbcConnectionPool implements ConnectionPool {
 
-
     private static final int INITIAL_POOL_SIZE = 10;
     private static final int INCREMENT_SIZE = 5;
     private static final Logger LOGGER = Logger.getLogger(ConnectionUtil.class.getName());
 
-    //TODO constants
+    private static JdbcConnectionPool instance = null;
+    //TODO constants. IS IT POSSIBLE?
     private String url;
     private String username;
     private String password;
@@ -27,8 +27,7 @@ public final class JdbcConnectionPool implements ConnectionPool {
     private List<Connection> connectionPool;
     private List<Connection> usedConnections;
 
-    //TODO singleton
-    public JdbcConnectionPool() {
+    private JdbcConnectionPool() {
         Properties props = new Properties();
         try {
             props.load(ConnectionUtil.class.getResourceAsStream("/jdbc.properties"));
@@ -46,8 +45,14 @@ public final class JdbcConnectionPool implements ConnectionPool {
         } catch (SQLException e) {
             LOGGER.log(Level.ERROR, "Could not create connection: ", e);
         }
-
         usedConnections = new ArrayList<>();
+    }
+
+    public static JdbcConnectionPool getInstance() {
+        if (instance == null) {
+            instance = new JdbcConnectionPool();
+        }
+        return instance;
     }
 
     @Override

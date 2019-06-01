@@ -19,7 +19,7 @@ import static org.taxreport.utils.MD5Util.*;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
-    private DaoPool daoPool = new DaoPoolImpl();
+    private DaoPool daoPool = DaoPoolImpl.getInstance();
     private UserService userService = new UserServiceImpl(daoPool);
 
     @Override
