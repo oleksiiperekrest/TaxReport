@@ -16,8 +16,12 @@ import java.util.Optional;
 
 public class ReportStatusDaoImpl implements ReportStatusDao {
 
-    public static final String SELECT_ID = "SELECT id FROM report_status WHERE status = ?";
+    public static final String SELECT_ID_BY_STATUS = "SELECT id FROM report_status WHERE status = ?";
+    public static final String SELECT_ALL = "SELECT * FROM report_status";
+    public static final String SELECT_BY_ID = "SELECT status FROM report_status WHERE id = ?";
     public static final String CREATE = "INSERT INTO report_status (status) VALUES (?)";
+    public static final String UPDATE = "UPDATE report_status SET status = ? WHERE (id = ?)";
+    public static final String DELETE = "DELETE FROM report_status WHERE id = ?";
     private final Logger LOGGER = Logger.getLogger(getClass());
 
     private ConnectionPool connectionPool;
@@ -32,7 +36,7 @@ public class ReportStatusDaoImpl implements ReportStatusDao {
     public Optional<Long> getIdByStatus(String status) {
         Connection connection = connectionPool.getConnection();
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ID);
+            PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ID_BY_STATUS);
             preparedStatement.setString(1, status);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -71,7 +75,7 @@ public class ReportStatusDaoImpl implements ReportStatusDao {
     public Optional<ReportStatus> getById(Long id) {
         Connection connection = connectionPool.getConnection();
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT status FROM report_status WHERE id = ?");
+            PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID);
             preparedStatement.setLong(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -90,7 +94,7 @@ public class ReportStatusDaoImpl implements ReportStatusDao {
         Connection connection = connectionPool.getConnection();
         List<ReportStatus> reportStatusList = new ArrayList<>();
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM report_status");
+            PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 Long id = resultSet.getLong("id");
@@ -107,11 +111,36 @@ public class ReportStatusDaoImpl implements ReportStatusDao {
 
     @Override
     public void update(ReportStatus reportStatus) {
-
+        Connection connection = connectionPool.getConnection();
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(UPDATE);
+            preparedStatement.setString(1, reportStatus.getStatus());
+            preparedStatement.setLong(2, reportStatus.getId());
+            int affectedRows = preparedStatement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Updating report status failed, no rows affected.");
+            }
+        } catch (SQLException e) {
+            LOGGER.error(e);
+        } finally {
+            connectionPool.releaseConnection(connection);
+        }
     }
 
     @Override
     public void delete(ReportStatus reportStatus) {
-
+        Connection connection = connectionPool.getConnection();
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(DELETE);
+            preparedStatement.setLong(1, reportStatus.getId());
+            int affectedRows = preparedStatement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Updating report status failed, no rows affected.");
+            }
+        } catch (SQLException e) {
+            LOGGER.error(e);
+        } finally {
+            connectionPool.releaseConnection(connection);
+        }
     }
 }
