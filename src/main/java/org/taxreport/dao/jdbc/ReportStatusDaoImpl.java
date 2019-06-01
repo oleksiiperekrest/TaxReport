@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import org.taxreport.dao.DaoPool;
 import org.taxreport.dao.ReportStatusDao;
 import org.taxreport.entity.ReportStatus;
-import org.taxreport.dao.connection.ConnectionPool;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -24,17 +23,16 @@ public class ReportStatusDaoImpl implements ReportStatusDao {
     private static final String DELETE = "DELETE FROM report_status WHERE id = ?";
     private final Logger LOGGER = Logger.getLogger(getClass());
 
-    private ConnectionPool connectionPool;
     private DaoPool daoPool;
 
-    public ReportStatusDaoImpl(ConnectionPool connectionPool, DaoPool daoPool) {
-        this.connectionPool = connectionPool;
+    public ReportStatusDaoImpl(DaoPool daoPool) {
+
         this.daoPool = daoPool;
     }
 
     @Override
     public Optional<Long> getIdByStatus(String status) {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ID_BY_STATUS);
             preparedStatement.setString(1, status);
@@ -45,14 +43,14 @@ public class ReportStatusDaoImpl implements ReportStatusDao {
         } catch (SQLException e) {
             LOGGER.error(e);
         } finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
         return Optional.empty();
     }
 
     @Override
     public void create(ReportStatus reportStatus) {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(CREATE);
             preparedStatement.setString(1, reportStatus.getStatus());
@@ -67,13 +65,13 @@ public class ReportStatusDaoImpl implements ReportStatusDao {
         } catch (SQLException e) {
             LOGGER.error(e);
         } finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
     }
 
     @Override
     public Optional<ReportStatus> getById(Long id) {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID);
             preparedStatement.setLong(1, id);
@@ -84,14 +82,14 @@ public class ReportStatusDaoImpl implements ReportStatusDao {
         } catch (SQLException e) {
             LOGGER.error(e);
         } finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
         return Optional.empty();
     }
 
     @Override
     public List<ReportStatus> getAll() {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         List<ReportStatus> reportStatusList = new ArrayList<>();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL);
@@ -104,14 +102,14 @@ public class ReportStatusDaoImpl implements ReportStatusDao {
         } catch (SQLException e) {
             LOGGER.error(e);
         } finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
         return reportStatusList;
     }
 
     @Override
     public void update(ReportStatus reportStatus) {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE);
             preparedStatement.setString(1, reportStatus.getStatus());
@@ -123,13 +121,13 @@ public class ReportStatusDaoImpl implements ReportStatusDao {
         } catch (SQLException e) {
             LOGGER.error(e);
         } finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
     }
 
     @Override
     public void delete(ReportStatus reportStatus) {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(DELETE);
             preparedStatement.setLong(1, reportStatus.getId());
@@ -140,7 +138,7 @@ public class ReportStatusDaoImpl implements ReportStatusDao {
         } catch (SQLException e) {
             LOGGER.error(e);
         } finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
     }
 }

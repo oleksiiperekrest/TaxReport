@@ -3,7 +3,6 @@ package org.taxreport.dao.jdbc;
 import org.apache.log4j.Logger;
 import org.taxreport.dao.DaoPool;
 import org.taxreport.dao.PersonnelDao;
-import org.taxreport.dao.connection.ConnectionPool;
 import org.taxreport.entity.*;
 
 import java.sql.*;
@@ -23,22 +22,21 @@ public class PersonnelDaoImpl implements PersonnelDao {
     private static final String UPDATE_INSPECTOR = "UPDATE personnel SET email = ?, password = ?, user_type_id =?, name = ?, inspector_badge = ?, description = ? WHERE (id = ?)";
     @SuppressWarnings("SqlNoDataSourceInspection")
     private static final String SELECT_ID_LIST = "SELECT * FROM personnel WHERE id IN ";
-    public static final String UPDATE_REPORTS_ON_DELETING = "UPDATE reports SET inspector_id = ? WHERE inspector_id = ?";
-    public static final String DELETE_FROM_REJECTED = "DELETE FROM rejected_inspectors WHERE inspector_id = ?";
-    public static final String DELETE_FROM_PERSONNEL = "DELETE FROM personnel WHERE id = ?";
+    private static final String UPDATE_REPORTS_ON_DELETING = "UPDATE reports SET inspector_id = ? WHERE inspector_id = ?";
+    private static final String DELETE_FROM_REJECTED = "DELETE FROM rejected_inspectors WHERE inspector_id = ?";
+    private static final String DELETE_FROM_PERSONNEL = "DELETE FROM personnel WHERE id = ?";
     private final Logger LOGGER = Logger.getLogger(getClass());
 
-    private ConnectionPool connectionPool;
     private DaoPool daoPool;
 
-    public PersonnelDaoImpl(ConnectionPool connectionPool, DaoPool daoPool) {
-        this.connectionPool = connectionPool;
+    public PersonnelDaoImpl(DaoPool daoPool) {
+
         this.daoPool = daoPool;
     }
 
     @Override
     public Optional<Personnel> getByEmail(String email) {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_EMAIL);
             preparedStatement.setString(1, email);
@@ -50,7 +48,7 @@ public class PersonnelDaoImpl implements PersonnelDao {
         } catch (SQLException e) {
             LOGGER.error(e);
         } finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
 
         return Optional.empty();
@@ -58,7 +56,7 @@ public class PersonnelDaoImpl implements PersonnelDao {
 
     @Override
     public void create(Personnel personnel) {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         try {
             if (personnel instanceof Admin) {
                 PreparedStatement preparedStatement = connection.prepareStatement(INSERT_ADMIN, Statement.RETURN_GENERATED_KEYS);
@@ -99,13 +97,13 @@ public class PersonnelDaoImpl implements PersonnelDao {
         } catch (NoSuchElementException | SQLException e) {
             LOGGER.error(e);
         } finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
     }
 
     @Override
     public Optional<Personnel> getById(Long id) {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID);
             preparedStatement.setLong(1, id);
@@ -114,7 +112,7 @@ public class PersonnelDaoImpl implements PersonnelDao {
         } catch (SQLException e) {
             LOGGER.error(e);
         } finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
         return Optional.empty();
     }
@@ -122,7 +120,7 @@ public class PersonnelDaoImpl implements PersonnelDao {
 
     @Override
     public List<Personnel> getAll() {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         List<Personnel> personnelList = new ArrayList<>();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL);
@@ -131,14 +129,14 @@ public class PersonnelDaoImpl implements PersonnelDao {
         } catch (SQLException e) {
             LOGGER.error(e);
         } finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
         return personnelList;
     }
 
     @Override
     public void update(Personnel personnel) {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         try {
             if (personnel instanceof Admin) {
                 PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_ADMIN);
@@ -170,13 +168,13 @@ public class PersonnelDaoImpl implements PersonnelDao {
         } catch (NoSuchElementException | SQLException e) {
             LOGGER.error(e);
         } finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
     }
 
     @Override
     public void delete(Personnel personnel) {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         try {
             connection.setAutoCommit(false);
             PreparedStatement updateReports = connection.prepareStatement(UPDATE_REPORTS_ON_DELETING);
@@ -196,7 +194,7 @@ public class PersonnelDaoImpl implements PersonnelDao {
         } catch (SQLException e) {
             LOGGER.error(e);
         } finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
 
     }
@@ -205,7 +203,7 @@ public class PersonnelDaoImpl implements PersonnelDao {
     public List<Personnel> getByIdList(List<Long> ids) {
         List<Personnel> personnelList = new ArrayList<>();
         if (ids != null && !ids.isEmpty()) {
-            Connection connection = connectionPool.getConnection();
+            Connection connection = daoPool.getConnectionPool().getConnection();
             StringBuilder inSql = new StringBuilder("(");
             ids.forEach(id -> inSql
                     .append(id)
@@ -234,7 +232,7 @@ public class PersonnelDaoImpl implements PersonnelDao {
             } catch (SQLException e) {
                 e.printStackTrace();
             } finally {
-                connectionPool.releaseConnection(connection);
+                daoPool.getConnectionPool().releaseConnection(connection);
             }
         }
         return personnelList;

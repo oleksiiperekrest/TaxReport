@@ -6,6 +6,7 @@ import org.taxreport.dao.connection.JdbcConnectionPool;
 
 public final class DaoPoolImpl implements DaoPool {
     private final DaoPoolImpl INSTANCE;
+    private final ConnectionPool connectionPool;
     private final ClientDao clientDao;
     private final PersonnelDao personnelDao;
     private final ReportStatusDao reportStatusDao;
@@ -13,15 +14,14 @@ public final class DaoPoolImpl implements DaoPool {
     private final UserTypeDao userTypeDao;
 
     //TODO singleton
-    //todo connection pool goes to dao pool
 
     public DaoPoolImpl () {
-        ConnectionPool connectionPool = new JdbcConnectionPool();
-        this.clientDao = new ClientDaoImpl(connectionPool, this);
-        this.personnelDao = new PersonnelDaoImpl(connectionPool, this);
-        this.reportStatusDao = new ReportStatusDaoImpl(connectionPool, this);
-        this.taxReportDao = new TaxReportDaoImpl(connectionPool, this);
-        this.userTypeDao = new UserTypeDaoImpl(connectionPool, this);
+        this.connectionPool = new JdbcConnectionPool();
+        this.clientDao = new ClientDaoImpl(this);
+        this.personnelDao = new PersonnelDaoImpl(this);
+        this.reportStatusDao = new ReportStatusDaoImpl(this);
+        this.taxReportDao = new TaxReportDaoImpl(this);
+        this.userTypeDao = new UserTypeDaoImpl(this);
 
         INSTANCE = this;
     }
@@ -51,5 +51,9 @@ public final class DaoPoolImpl implements DaoPool {
 
     public UserTypeDao getUserTypeDao() {
         return userTypeDao;
+    }
+
+    public ConnectionPool getConnectionPool() {
+        return connectionPool;
     }
 }

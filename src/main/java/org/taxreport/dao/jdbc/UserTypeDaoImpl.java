@@ -3,7 +3,6 @@ package org.taxreport.dao.jdbc;
 import org.apache.log4j.Logger;
 import org.taxreport.dao.DaoPool;
 import org.taxreport.dao.UserTypeDao;
-import org.taxreport.dao.connection.ConnectionPool;
 import org.taxreport.entity.UserType;
 
 import java.sql.Connection;
@@ -16,7 +15,6 @@ import java.util.Optional;
 
 public class UserTypeDaoImpl implements UserTypeDao {
 
-
     private static final String SELECT_ID_BY_STATUS = "SELECT id FROM user_type WHERE status = ?";
     private static final String SELECT_ALL = "SELECT * FROM user_type";
     private static final String SELECT_BY_ID = "SELECT type FROM user_type WHERE id = ?";
@@ -25,17 +23,16 @@ public class UserTypeDaoImpl implements UserTypeDao {
     private static final String DELETE = "DELETE FROM user_type WHERE id = ?";
     private final Logger LOGGER = Logger.getLogger(getClass());
 
-    private ConnectionPool connectionPool;
     private DaoPool daoPool;
 
-    public UserTypeDaoImpl(ConnectionPool connectionPool, DaoPool daoPool) {
-        this.connectionPool = connectionPool;
+    public UserTypeDaoImpl(DaoPool daoPool) {
+
         this.daoPool = daoPool;
     }
 
     @Override
     public Optional<Long> getIdByType(String type) {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ID_BY_STATUS);
             preparedStatement.setString(1, type);
@@ -46,7 +43,7 @@ public class UserTypeDaoImpl implements UserTypeDao {
         } catch (SQLException e) {
             LOGGER.error(e);
         } finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
         return Optional.empty();
     }
@@ -54,7 +51,7 @@ public class UserTypeDaoImpl implements UserTypeDao {
 
     @Override
     public void create(UserType userType) {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(CREATE);
             preparedStatement.setString(1, userType.getUserType());
@@ -69,13 +66,13 @@ public class UserTypeDaoImpl implements UserTypeDao {
         } catch (SQLException e) {
             LOGGER.error(e);
         } finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
     }
 
     @Override
     public Optional<UserType> getById(Long id) {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID);
             preparedStatement.setLong(1, id);
@@ -86,14 +83,14 @@ public class UserTypeDaoImpl implements UserTypeDao {
         } catch (SQLException e) {
             LOGGER.error(e);
         } finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
         return Optional.empty();
     }
 
     @Override
     public List<UserType> getAll() {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         List<UserType> userTypes = new ArrayList<>();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL);
@@ -106,14 +103,14 @@ public class UserTypeDaoImpl implements UserTypeDao {
         } catch (SQLException e) {
             LOGGER.error(e);
         } finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
         return userTypes;
     }
 
     @Override
     public void update(UserType userType) {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE);
             preparedStatement.setString(1, userType.getUserType());
@@ -125,13 +122,13 @@ public class UserTypeDaoImpl implements UserTypeDao {
         } catch (SQLException e) {
             LOGGER.error(e);
         } finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
     }
 
     @Override
     public void delete(UserType userType) {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(DELETE);
             preparedStatement.setLong(1, userType.getId());
@@ -142,7 +139,7 @@ public class UserTypeDaoImpl implements UserTypeDao {
         } catch (SQLException e) {
             LOGGER.error(e);
         } finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
     }
 }

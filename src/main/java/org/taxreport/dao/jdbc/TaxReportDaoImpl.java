@@ -3,7 +3,6 @@ package org.taxreport.dao.jdbc;
 import org.apache.log4j.Logger;
 import org.taxreport.dao.*;
 import org.taxreport.entity.*;
-import org.taxreport.dao.connection.ConnectionPool;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -23,18 +22,15 @@ public class TaxReportDaoImpl implements TaxReportDao {
     private static final String INSERT = "INSERT INTO reports (content, author_id, status_id," +
             " creation_datetime, update_datetime, inspector_id) VALUES (?, ?, ?, ?, ?, ?);";
 
-
-    private ConnectionPool connectionPool;
     private DaoPool daoPool;
 
-    public TaxReportDaoImpl(ConnectionPool connectionPool, DaoPool daoPool) {
-        this.connectionPool = connectionPool;
+    public TaxReportDaoImpl(DaoPool daoPool) {
         this.daoPool = daoPool;
     }
 
     @Override
     public void create(TaxReport taxReport) {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(
                     INSERT, Statement.RETURN_GENERATED_KEYS);
@@ -90,14 +86,14 @@ public class TaxReportDaoImpl implements TaxReportDao {
         } catch (SQLException e) {
             LOGGER.error(e);
         } finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
     }
 
     @Override
     public Optional<TaxReport> getById(Long id) {
 
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(
                     SELECT_BY_ID);
@@ -108,14 +104,14 @@ public class TaxReportDaoImpl implements TaxReportDao {
         } catch (SQLException e) {
             LOGGER.error(e);
         } finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
         return Optional.empty();
     }
 
     private List<Personnel> getRejectedInspectors(Long id) {
         List<Personnel> rejectedInspectors = new ArrayList<>();
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         List<Long> rejectedInspectorsIds = new ArrayList<>();
 
         try {
@@ -130,7 +126,7 @@ public class TaxReportDaoImpl implements TaxReportDao {
         } catch (SQLException e) {
             LOGGER.error(e);
         } finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
 
         return rejectedInspectors;
@@ -138,7 +134,7 @@ public class TaxReportDaoImpl implements TaxReportDao {
 
     @Override
     public List<TaxReport> getAll() {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         List<TaxReport> taxReports = new ArrayList<>();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL);
@@ -147,14 +143,14 @@ public class TaxReportDaoImpl implements TaxReportDao {
         } catch (SQLException e) {
             LOGGER.error(e);
         } finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
         return taxReports;
     }
 
     @Override
     public void update(TaxReport taxReport) {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE);
             preparedStatement.setString(1, taxReport.getContent());
@@ -172,13 +168,13 @@ public class TaxReportDaoImpl implements TaxReportDao {
         } catch (SQLException e) {
             LOGGER.error(e);
         } finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
     }
 
     @Override
     public void delete(TaxReport taxReport) {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
 
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(DELETE);
@@ -191,13 +187,13 @@ public class TaxReportDaoImpl implements TaxReportDao {
         } catch (SQLException e) {
             LOGGER.error(e);
         } finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
     }
 
     @Override
     public List<TaxReport> getByClientId(Long id) {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         List<TaxReport> taxReports = new ArrayList<>();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM reports WHERE author_id = ?");
@@ -213,7 +209,7 @@ public class TaxReportDaoImpl implements TaxReportDao {
 
     @Override
     public List<TaxReport> getByClientIdWithDummyAuthor(Long id, Client author) {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         List<TaxReport> taxReports = new ArrayList<>();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM reports WHERE author_id = ?");
@@ -224,7 +220,7 @@ public class TaxReportDaoImpl implements TaxReportDao {
         } catch (SQLException e) {
             LOGGER.error(e);
         } finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
         return taxReports;
     }

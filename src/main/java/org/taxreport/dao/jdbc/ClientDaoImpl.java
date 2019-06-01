@@ -2,10 +2,8 @@ package org.taxreport.dao.jdbc;
 
 import org.apache.log4j.Logger;
 import org.taxreport.dao.ClientDao;
-
 import org.taxreport.dao.DaoPool;
 import org.taxreport.entity.*;
-import org.taxreport.dao.connection.ConnectionPool;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -22,23 +20,19 @@ public class ClientDaoImpl implements ClientDao {
     private static final String INSERT_LEGAL = "INSERT INTO clients (email, password, user_type_id, legal_name, enterprise_code) VALUES (?, ?, ?, ?, ?)";
     private static final String UPDATE_INDIVIDUAL = "UPDATE clients SET email = ?, password = ?, user_type_id =?, first_name = ?, last_name = ?, individual_number = ? WHERE (id = ?)";
     private static final String UPDATE_LEGAL = "UPDATE clients SET email = ?, password = ?, user_type_id =?, legal_name = ?, enterprise_code = ? WHERE (id = ?)";
-    public static final String DELETE_FROM_REPORTS = "DELETE FROM reports WHERE client_id = ?";
-    public static final String DELETE_FROM_CLIENTS = "DELETE FROM clients WHERE id = ?";
+    private static final String DELETE_FROM_REPORTS = "DELETE FROM reports WHERE client_id = ?";
+    private static final String DELETE_FROM_CLIENTS = "DELETE FROM clients WHERE id = ?";
     private final Logger LOGGER = Logger.getLogger(getClass());
 
-
-    private ConnectionPool connectionPool;
     private DaoPool daoPool;
 
-
-    public ClientDaoImpl(ConnectionPool connectionPool, DaoPool daoPool) {
-        this.connectionPool = connectionPool;
+    public ClientDaoImpl(DaoPool daoPool) {
         this.daoPool = daoPool;
     }
 
     @Override
     public Optional<Client> getByEmail(String email) {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_EMAIL);
             preparedStatement.setString(1, email);
@@ -49,7 +43,7 @@ public class ClientDaoImpl implements ClientDao {
             LOGGER.error(e);
         }
         finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
 
         return Optional.empty();
@@ -57,7 +51,7 @@ public class ClientDaoImpl implements ClientDao {
 
     @Override
     public void create(Client client) {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         try {
             if (client instanceof Individual) {
                 PreparedStatement preparedStatement = connection.prepareStatement(INSERT_INDIVIDUAL, Statement.RETURN_GENERATED_KEYS);
@@ -99,13 +93,13 @@ public class ClientDaoImpl implements ClientDao {
             LOGGER.error(e);
         }
         finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
     }
 
     @Override
     public Optional<Client> getById(Long id) {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID);
             preparedStatement.setLong(1, id);
@@ -115,14 +109,14 @@ public class ClientDaoImpl implements ClientDao {
             LOGGER.error(e);
         }
         finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
         return Optional.empty();
     }
 
     @Override
     public List<Client> getAll() {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         List<Client> clientList = new ArrayList<>();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL);
@@ -132,14 +126,14 @@ public class ClientDaoImpl implements ClientDao {
             LOGGER.error(e);
         }
         finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
         return clientList;
     }
 
     @Override
     public void update(Client client) {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         try {
             if (client instanceof Individual) {
                 PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_INDIVIDUAL);
@@ -171,13 +165,13 @@ public class ClientDaoImpl implements ClientDao {
             LOGGER.error(e);
         }
         finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
     }
 
     @Override
     public void delete(Client client) {
-        Connection connection = connectionPool.getConnection();
+        Connection connection = daoPool.getConnectionPool().getConnection();
         try {
             connection.setAutoCommit(false);
             PreparedStatement deleteFromReportsPS = connection.prepareStatement(DELETE_FROM_REPORTS);
@@ -195,7 +189,7 @@ public class ClientDaoImpl implements ClientDao {
             LOGGER.error(e);
         }
         finally {
-            connectionPool.releaseConnection(connection);
+            daoPool.getConnectionPool().releaseConnection(connection);
         }
     }
 
