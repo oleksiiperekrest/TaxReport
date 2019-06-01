@@ -26,6 +26,34 @@
 <br>
     <c:out value='${sessionScope.get("user").toString()}'/>
 </h4>
+<c:set var="user" scope="session" value='${sessionScope.get("user")}'/>
+<c:set var="role" scope="session" value='${user.getType()}'/>
+<c:if test="${role == 'Individual'}">
+    <table border="1">
+        <thead>
+
+        <th>Id</th>
+        <th>Email</th>
+        <th>First name</th>
+        <th>Last name</th>
+        <th>Number</th>
+
+        </thead>
+        <tbody>
+
+            <tr>
+
+                <td>${user.getId()}</td>
+                <td>${user.getEmail()}</td>
+                <td>${user.getFirstName()}</td>
+                <td>${user.getLastName()}</td>
+                <td>${user.getTaxpayerNumber()}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</c:if>
+
 <c:set var="role" scope="session" value='${sessionScope.get("role")}'/>
 <%--<fmt:setLocale value="${param.lang}" />--%>
 
