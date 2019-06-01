@@ -3,6 +3,7 @@ package org.taxreport.utils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Level;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -18,7 +19,7 @@ public final class ConnectionUtil {
         Properties props = new Properties();
         try {
             props.load(ConnectionUtil.class.getResourceAsStream("/jdbc.properties"));
-        } catch (Exception e) {
+        } catch (IOException e) {
             Logger.getLogger(ConnectionUtil.class.getName()).log(Level.ERROR,
                     "Could not read properties file: ", e);
         }
