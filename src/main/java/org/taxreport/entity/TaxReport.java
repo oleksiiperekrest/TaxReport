@@ -6,7 +6,7 @@ import java.util.List;
 public class TaxReport extends Entity {
 
     private Client author;
-    private String content;
+    private ReportContent content;
     private LocalDateTime creationTime;
     private ReportStatus reportStatus;
     private Personnel inspector;
@@ -17,7 +17,7 @@ public class TaxReport extends Entity {
                      Personnel inspector, List<Personnel> rejectedInspectors, LocalDateTime lastUpdatedTime) {
         super(id);
         this.author = author;
-        this.content = content;
+        this.content = new ReportContent(content);
         this.creationTime = creationTime;
         this.reportStatus = reportStatus;
         this.inspector = inspector;
@@ -33,7 +33,7 @@ public class TaxReport extends Entity {
         this.author = author;
     }
 
-    public String getContent() {
+    public ReportContent getContent() {
         return content;
     }
 
@@ -70,4 +70,5 @@ public class TaxReport extends Entity {
         sb.append('}');
         return super.toString() + sb.toString();
     }
+
 }
