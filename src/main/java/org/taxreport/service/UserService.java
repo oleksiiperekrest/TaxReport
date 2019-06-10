@@ -13,10 +13,10 @@ public interface UserService {
     List<Client> getAllClients();
     List<Personnel> getAllPersonnel();
 
-    Optional<Client> getClientById(Long id);
-    Optional<Personnel> getPersonnelById(Long id);
+    Client getClientById(Long id);
+    Personnel getPersonnelById(Long id);
 
-    Optional<? extends User> getByEmail(String email);
+    User getByEmail(String email);
 
     boolean login(String email, String password);
 }

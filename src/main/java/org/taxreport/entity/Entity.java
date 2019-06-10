@@ -6,7 +6,7 @@ public abstract class Entity {
 
     private Long id;
 
-    public Entity(Long id) {
+    Entity(Long id) {
         this.id = id;
     }
 
@@ -17,22 +17,6 @@ public abstract class Entity {
     public void setId(Long id) {
         this.id = id;
     }
-
-//    private Entity(Builder builder) {
-//        this.id = builder.id;
-//    }
-//    protected class Builder {
-//        private Long id;
-//
-//        Builder withId(Long id) {
-//            this.id = id;
-//            return this;
-//        }
-//        Entity build() {
-//            return new Entity(this);
-//        }
-//    }
-
 
     @Override
     public String toString() {
@@ -56,7 +40,7 @@ public abstract class Entity {
 
     @Override
     public int hashCode() {
-
         return Objects.hash(id);
     }
+
 }

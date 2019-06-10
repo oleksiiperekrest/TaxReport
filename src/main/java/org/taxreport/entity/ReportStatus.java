@@ -1,7 +1,5 @@
 package org.taxreport.entity;
 
-
-
 public final class ReportStatus extends Entity {
     private String status;
 
@@ -19,6 +17,6 @@ public final class ReportStatus extends Entity {
         final StringBuilder sb = new StringBuilder("ReportStatus{");
         sb.append("status='").append(status).append('\'');
         sb.append('}');
-        return sb.toString();
+        return super.toString() + sb.toString();
     }
 }

@@ -43,7 +43,7 @@ public class LoginCommand extends Command {
             String email = request.getParameter("email");
             String password = request.getParameter("password");
 
-            User user = userService.getByEmail(email).get();
+            User user = userService.getByEmail(email);
             if (userService.login(email, getMd5(password))) {
 
                 session.setAttribute("role", user.getType());
@@ -51,13 +51,14 @@ public class LoginCommand extends Command {
                 session.setAttribute("reports", taxReportService.getByClientId(user.getId()));
                 session.setAttribute("email", email);
                 try {
-                    redirect(WELCOME);
+                    forward(WELCOME);
                 } catch (Exception e) {
                     LOGGER.error(e);
                     redirect(ERROR);
                 }
             } else {
                 session.setAttribute("error", "login_failed");
+                forward("login");
             }
         }
 

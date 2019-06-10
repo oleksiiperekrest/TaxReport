@@ -63,4 +63,5 @@ public class Individual extends Client {
 
         return Objects.hash(super.hashCode(), firstName, lastName, taxpayerNumber);
     }
+
 }

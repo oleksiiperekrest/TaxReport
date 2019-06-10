@@ -34,7 +34,6 @@ public class TaxReportDaoImpl implements TaxReportDao {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(
                     INSERT, Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setString(1, taxReport.getContent());
             preparedStatement.setLong(2, taxReport.getAuthor().getId());
             Optional<Long> idByStatus = daoPool.getReportStatusDao().getIdByStatus(taxReport.getReportStatus().getStatus());
             if (!idByStatus.isPresent()) {
@@ -97,6 +96,7 @@ public class TaxReportDaoImpl implements TaxReportDao {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(
                     SELECT_BY_ID);
+            preparedStatement.setLong(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 return Optional.of(getFromResultSet(resultSet).get(0));
@@ -153,7 +153,7 @@ public class TaxReportDaoImpl implements TaxReportDao {
         Connection connection = daoPool.getConnectionPool().getConnection();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE);
-            preparedStatement.setString(1, taxReport.getContent());
+            preparedStatement.setString(1, taxReport.getContent().toString());
             preparedStatement.setLong(2, taxReport.getAuthor().getId());
             preparedStatement.setLong(3, taxReport.getReportStatus().getId());
             preparedStatement.setTimestamp(4, Timestamp.valueOf(taxReport.getCreationTime()));
@@ -228,6 +228,7 @@ public class TaxReportDaoImpl implements TaxReportDao {
     private List<TaxReport> getFromResultSet(ResultSet resultSet) {
         List<TaxReport> taxReports = new ArrayList<>();
         try {
+            resultSet.beforeFirst();
             while (resultSet.next()) {
                 Long id = resultSet.getLong("id");
                 Client author = daoPool.getClientDao().getById(resultSet.getLong("author_id")).get();

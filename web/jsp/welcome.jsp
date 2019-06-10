@@ -1,60 +1,86 @@
-<%@ page contentType="text/html; charset=utf-8" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
-<%--<fmt:setLocale value="ru"/>--%>
-
-<fmt:setLocale value="${param.lang}"/>
-
-<fmt:setBundle basename="text"/>
-<fmt:requestEncoding value="utf-8"/>
-
+<%@include file="../parts/header.jsp" %>
 
 <html>
 <head>
-    <title>Welcome</title>
+    <title><fmt:message key="welcome"/></title>
 </head>
 <body>
+
 <h2>
     <c:out value='${sessionScope.get("email")}'/>
+    <c:set var="role" scope="session" value='${sessionScope.get("role")}'/>
     <br>
-    <c:out value='${sessionScope.get("role")}'/>
+    <fmt:message key='${role}'/>
+
+    <br>
+</h2>
+
+<h4>
     <%--<c:set var = "user" scope = "page" value = '${sessionScope.get("user")}'/>--%>
     <%--<c:out value='user'/>--%>
-</h2>
-<h4>
-<br>
-    <c:out value='${sessionScope.get("user").toString()}'/>
+    <br>
+
 </h4>
-<c:set var="user" scope="session" value='${sessionScope.get("user")}'/>
-<c:set var="role" scope="session" value='${user.getType()}'/>
-<c:if test="${role == 'Individual'}">
-    <table border="1">
-        <thead>
+<%--<c:set var="user" scope="session" value='${sessionScope.get("user")}'/>--%>
+<%--<c:set var="role" scope="session" value='${user.getType()}'/>--%>
+<%--<c:set var="reports" scope="session" value='${sessionScope.get("reports")}'/>--%>
 
-        <th>Id</th>
-        <th>Email</th>
-        <th>First name</th>
-        <th>Last name</th>
-        <th>Number</th>
+<%--<c:if test="${role == 'Individual'}">--%>
+<%--<table border="1" style="border: 3px black solid">--%>
+<%--<thead>--%>
 
-        </thead>
-        <tbody>
+<%--<th><fmt:message key="id"/></th>--%>
+<%--<th><fmt:message key="submit_date"/></th>--%>
+<%--<th><fmt:message key="content"/></th>--%>
+<%--<th><fmt:message key="inspector"/></th>--%>
+<%--<th><fmt:message key="status"/></th>--%>
+<%--<th><fmt:message key="update_date"/></th>--%>
+<%--<th><fmt:message key="change"/></th>--%>
 
-            <tr>
 
-                <td>${user.getId()}</td>
-                <td>${user.getEmail()}</td>
-                <td>${user.getFirstName()}</td>
-                <td>${user.getLastName()}</td>
-                <td>${user.getTaxpayerNumber()}</td>
-            </tr>
+<%--</thead>--%>
+<%--<tbody>--%>
+<%--<c:forEach items="${reports}" var="current">--%>
+<%--<c:set var="report_id" value="${current.getId()}"/>--%>
+<%--<c:set var="report_status" value="${current.getReportStatus().getStatus()}"/>--%>
+<%--<tr>--%>
 
-        </tbody>
-    </table>
-</c:if>
+<%--<td>${current.getId()}</td>--%>
+<%--<td>${current.getCreationTime()}</td>--%>
+<%--<td>--%>
+<%--<table border="1" style="border: solid thin grey">--%>
+<%--<thead>--%>
+<%--<th><fmt:message key="earned_income"/></th>--%>
+<%--<th><fmt:message key="unearned_income"/></th>--%>
+<%--<th><fmt:message key="tax_rate"/></th>--%>
+<%--<th><fmt:message key="comment"/></th>--%>
+<%--<th><fmt:message key="tax"/></th>--%>
+<%--</thead>--%>
+<%--<tbody>--%>
+<%--<td>${current.getContent().getEarnedIncome()}</td>--%>
+<%--<td>${current.getContent().getUnearnedIncome()}</td>--%>
+<%--<td>${current.getContent().getTaxRate()}</td>--%>
+<%--<td>${current.getContent().getComment()}</td>--%>
+<%--<td>${current.getContent(). getTax()}</td>--%>
+<%--</tbody>--%>
+<%--</table>--%>
+<%--&lt;%&ndash;${current.getContent().toJson()}&ndash;%&gt;--%>
+<%--</td>--%>
+<%--<td>${current.getInspector().getName()}</td>--%>
+<%--<td><fmt:message key='${report_status}'/></td>--%>
+<%--<td>${current.getLastUpdatedTime()}</td>--%>
+<%--<td><a href='/edit_report?id=${report_id}'>--%>
+<%--<fmt:message key="edit_report"/></a></td>--%>
+<%--</tr>--%>
 
-<c:set var="role" scope="session" value='${sessionScope.get("role")}'/>
+<%--</c:forEach>--%>
+
+
+<%--</tbody>--%>
+<%--</table>--%>
+<%--</c:if>--%>
+
+
 <%--<fmt:setLocale value="${param.lang}" />--%>
 
 <%--<fmt:requestEncoding value="UTF-8"/>--%>
@@ -68,12 +94,12 @@
 
 <%--<c:if test="${role == 'Individual' or role == 'LegalEntity'}">--%>
 <h3>
-<a href="<c:url value = "/reports"/>"><fmt:message key="reports"/></a>
-<br>
-<a href="<c:url value = "/jsp/add_report.jsp"/>"><fmt:message key="new_report"/></a></a>
-<br>
-<a href="<c:url value = "/jsp/logout.jsp"/>"><fmt:message key="logout"/></a></a>
-<br>
+    <a href="<c:url value = "/?command=Reports"/>"><fmt:message key="my_reports"/></a>
+    <br>
+    <a href="<c:url value = "/?command=AddReport"/>"><fmt:message key="new_report"/></a>
+    <br>
+    <a href="<c:url value = "/?command=Logout"/>"><fmt:message key="logout"/></a>
+    <br>
     <c:out value=""/>
 </h3>
 <%--<br>--%>
@@ -81,16 +107,10 @@
 <%--<br>--%>
 <%--<a href="<c:url value = "?lang=en"/>"><fmt:message key="english"/></a></a>--%>
 
-<br>
-<a href="?lang=ru"> RU </a>
-<br>
-<a href="?lang=en"> EN </a>
-
-<a href="<c:url value="/welcome?lang=ru"/><c:out value='RU'></c:out></a>
-<br>
-<a href = "
-<c:url value="/welcome?lang=en"/>
-<c:out value='EN'></c:out></a>
+<%--<br>--%>
+<%--<a href="?lang=ru"> RU </a>--%>
+<%--<br>--%>
+<%--<a href="?lang=en"> EN </a>--%>
 
 <%--</c:if>--%>
 <c:if test="${role == 'Admin'}">

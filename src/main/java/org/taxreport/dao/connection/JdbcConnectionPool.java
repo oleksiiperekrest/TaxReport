@@ -2,7 +2,6 @@ package org.taxreport.dao.connection;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.taxreport.utils.ConnectionUtil;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -16,7 +15,7 @@ public final class JdbcConnectionPool implements ConnectionPool {
 
     private static final int INITIAL_POOL_SIZE = 10;
     private static final int INCREMENT_SIZE = 5;
-    private static final Logger LOGGER = Logger.getLogger(ConnectionUtil.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(JdbcConnectionPool.class.getName());
 
     private static JdbcConnectionPool instance = null;
     //TODO constants. IS IT POSSIBLE?
@@ -30,7 +29,7 @@ public final class JdbcConnectionPool implements ConnectionPool {
     private JdbcConnectionPool() {
         Properties props = new Properties();
         try {
-            props.load(ConnectionUtil.class.getResourceAsStream("/jdbc.properties"));
+            props.load(JdbcConnectionPool.class.getResourceAsStream("/jdbc.properties"));
 
             url = props.getProperty("url");
             username = props.getProperty("username");

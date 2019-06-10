@@ -10,6 +10,7 @@ import org.taxreport.entity.User;
 import org.taxreport.service.UserService;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 public class UserServiceImpl implements UserService {
@@ -39,22 +40,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<Client> getClientById(Long id) {
-        return daoPool.getClientDao().getById(id);
+    public Client getClientById(Long id) {
+        return daoPool.getClientDao().getById(id).get();
     }
 
     @Override
-    public Optional<Personnel> getPersonnelById(Long id) {
-        return daoPool.getPersonnelDao().getById(id);
+    public Personnel getPersonnelById(Long id) {
+        return daoPool.getPersonnelDao().getById(id).get();
     }
 
     @Override
-    public Optional<? extends User> getByEmail(String email) {
-        Optional<Personnel> personnel = daoPool.getPersonnelDao().getByEmail(email);
-        if (!personnel.isPresent()) {
-            return daoPool.getClientDao().getByEmail(email);
+    public User getByEmail(String email) {
+        try {
+            Client client = daoPool.getClientDao().getByEmail(email).get();
+            return client;
+        } catch (NoSuchElementException e) {
+            try {
+                Personnel personnel = daoPool.getPersonnelDao().getByEmail(email).get();
+                return personnel;
+            } catch (NoSuchElementException ee) {
+                throw ee;
+            }
         }
-        return personnel;
     }
 
 

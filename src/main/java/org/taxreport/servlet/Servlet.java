@@ -18,18 +18,17 @@ public class Servlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        try {
-            Command command = getCommand(req);
-            command.init(getServletContext(), req, resp);
-            command.execute();
-        } catch (Exception e) {
-            LOGGER.error(e);
-            resp.sendRedirect("jsp/error.jsp");
+        if (req.getParameter("command") != null) {
+            process(req, resp);
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        process(req, resp);
+    }
+
+    private void process(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             Command command = getCommand(req);
             command.init(getServletContext(), req, resp);
@@ -43,9 +42,10 @@ public class Servlet extends HttpServlet {
 
     private Command getCommand(HttpServletRequest request) {
         try {
+            String command = request.getParameter("command");
             Class type = Class.forName(String.format(
                     "org.taxreport.servlet.command.%sCommand",
-                    request.getParameter("command")));
+                    command));
             return (Command) type
                     .asSubclass(Command.class)
                     .newInstance();

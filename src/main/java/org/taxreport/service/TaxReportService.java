@@ -8,7 +8,8 @@ import java.util.Optional;
 public interface TaxReportService {
     void create(TaxReport taxReport);
 
-    Optional<TaxReport> getById(Long id);
+    TaxReport getById(Long id);
 
     List<TaxReport> getAll();
+    List<TaxReport> getByClientId(Long id);
 }

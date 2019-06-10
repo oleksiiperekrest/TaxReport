@@ -24,39 +24,13 @@ public abstract class User extends Entity {
         return password;
     }
 
-
-
-    //    protected User(Builder builder) {
-
-    //    }
-//        }
-//            return new User(this);
-//        public User build() {
-//
-//        }
-//            return this;
-//            this.password = password;
-//        Builder withPassword(String password) {
-//
-//        }
-//            return this;
-//            this.email = email;
-//        Builder withEmail(String email) {
-//
-//        private String password;
-//        private String email;
-//    public class Builder {
-//    }
-//        this.password = builder.password;
-//        this.email = builder.email;
-//        super.new Builder().withId(builder.id).build();
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("User{");
         sb.append("email='").append(email).append('\'');
         sb.append(", password='").append(password).append('\'');
         sb.append('}');
-        return sb.toString();
+        return super.toString() + sb.toString();
     }
 
     @Override
@@ -77,4 +51,5 @@ public abstract class User extends Entity {
 
         return Objects.hash(email, password);
     }
+
 }
